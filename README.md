@@ -126,14 +126,27 @@
     (3)虽然在大多数情况下是有用的，但是 我们想要知道 贪心算法 是否是可行方案时， 只要我们能够举出一种反例（意思就是局部最优，无法组成全局最优），那么就说明 该问题使用贪心算法无效。
    ```
 - [给定一个由字符串组成的数组strs，必须把所有的字符串拼接起来，返回所有的拼接结果中，字典序最小的结果](greedyAlgorithm/LowestLexicography.java):字典序就是java里面字符串的排序方式。
-
-
+- [会议室的最佳安排](greedyAlgorithm/BestArrange.java)(具体题目都写在MyBase中): 排序， 以结束时间早晚排序 为 贪心策略
+- [Light](greedyAlgorithm/Light.java): 分析放灯的情况，选择最贪心的位置进行放灯（比如说 三个位置 灯放中间）
+- [IPO](greedyAlgorithm/IPO.java): 
+  - Initial Public Offering(首次公开募股). https://leetcode-cn.com/problems/ipo/ . 
+  - 大小堆。 小堆：按成本排序。 大堆：可以购买的项目中，按profit排序。
+  - 策略： 每次都现根据cost在可以选择的项目中，选取profit最大的。最后到达K个项目，结束。
+- [最小代价分割金条](greedyAlgorithm/LessMoneySplitGold.java): 哈夫曼编码，堆。 策略：【每次选最小的两个合并】，然后组成新的数组。每次合并就是成本。最终合并成只有一个数字的时候，即得到最终答案。
 ### 并查集: 图的连通性问题。
-```aidl
+```
 如果你一开始所有的样本量是N， 只要你 findHead 这件事情，它的调用次数 到达了O（N）或超过了O（N）（足够频繁），那么单次均摊下来，查询代价O(1)。他有可能某一个时刻花费时间非常长，但是均摊下来非常省。
 说白了，并查集，查询只要到达了样本量这个规模，单次非常的快，就是O（1）.
 ```
-
+- [并查集实现-哈希表](unionFindSet/UnionFindSet.java): 
+  - 建立三个关系映射表：【1】普通元素到包装成对象的节点的映射（从而可以避免元素相同值的问题，转换成对象是为了使用不同对象的地址值各不相同，从而区分每一个节点） 【2】parent表 【3】size表。 
+  - 关键点就是 围绕 代表节点（findFather-任意节点的代表节点的查找，isSameSet-判断两个节点代表节点是否相同，union-将小size的代表节点挂到大size的代表节点下面）。
+- [朋友的圈子/省份数量](unionFindSet/NumberOfProvinces.java):
+  - https://leetcode-cn.com/problems/number-of-provinces/ . 
+  - 数组形式实现并查集。
+- [岛屿数量](unionFindSet/NumOfIslands.java): 
+  - 测试链接：https://leetcode.com/problems/number-of-islands/
+  
 
 ### TopK
 - [快排方法](topK/quickSort.java):
