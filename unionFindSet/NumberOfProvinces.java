@@ -73,6 +73,6 @@ public class NumberOfProvinces {
                 }
             }
         }
-        return unionFind.sets;
+        return unionFind.sets();
     }
 }

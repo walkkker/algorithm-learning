@@ -5,7 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-// https://leetcode-cn.com/problems/number-of-islands/
+/**
+ * https://leetcode-cn.com/problems/number-of-islands/
+ *
+ * 实现： 深度优先遍历递归 + 并查集数组实现形式
+ */
+
 public class NumOfIslands {
 
     // 深度优先搜索
@@ -136,7 +141,103 @@ public class NumOfIslands {
 
 
     // 并查集解法2 - 数组实现形式
+    public int numIslands(char[][] grid) {
+        // 每个位置都代表 一个 集合元素，所以创建 row * col长度的 parent,size数组
+        if (grid == null || grid.length == 0) {
+            return 0;
+        }
+        UnionFind2 uf = new UnionFind2(grid);
+        int row = grid.length;
+        int col = grid[0].length;
+        // 每个节点 与 左上部分进行检验，两者都为一则进行集合合并
+        // 第一行，无上
+        for (int j = 1; j < col; j++) {
+            if (grid[0][j - 1] == '1' && grid[0][j] == '1') {
+                uf.union(0 , j - 1, 0, j);
+            }
+        }
 
+        for (int i = 1; i < row; i++) {
+            if (grid[i - 1][0] == '1' && grid[i][0] == '1') {
+                uf.union(i - 1, 0, i, 0);
+            }
+        }
 
+        for (int i = 1; i < row; i++) {
+            for (int j = 1; j < col; j++) {
+                if (grid[i][j - 1] == '1' && grid[i][j] == '1') {
+                    uf.union(i, j-1, i , j);
+                }
+                if (grid[i - 1][j] == '1' && grid[i][j] == '1') {
+                    uf.union(i - 1, j, i , j);
+                }
+            }
+        }
+        return uf.sets();
+    }
 
+    public class UnionFind2 {
+        int[] parent;
+        int[] size;
+        int[] help;
+        int sets;
+        int col;
+
+        public UnionFind2(char[][] grid) {
+            int row = grid.length;
+            col = grid[0].length;
+            int length = row * col;
+            parent = new int[length];
+            size = new int[length];
+            help = new int[length];
+            sets = 0;
+            // 创建完 parent, size后 要在构造器中进行初始化
+            for (int r = 0; r < row; r++) {
+                for (int c = 0; c < col; c++) {
+                    if (grid[r][c] == '1') {
+                        int index = index(r, c);
+                        parent[index] = index;
+                        size[index] = 1;
+                        sets++;
+                    }
+                }
+            }
+        }
+
+        public int index(int r, int c) {
+            return r * col + c;
+        }
+
+        public int find(int i) {
+            int hi = 0;
+            while (i != parent[i]) {
+                help[hi++] = i;
+                i = parent[i];
+            }
+            for (hi--; hi >= 0; hi--) {
+                parent[help[hi]] = i;
+            }
+            return i;
+        }
+
+        public void union(int r1, int c1, int r2, int c2) {
+            int i1 = index(r1, c1);
+            int i2 = index(r2, c2);
+            int aHead = find(i1);
+            int bHead = find(i2);
+            if (aHead != bHead) {
+                int aSize = size[aHead];
+                int bSize = size[bHead];
+                int big = aSize >= bSize ? aHead : bHead;
+                int small = big == aHead ? bHead : aHead;
+                parent[small] = big;
+                size[big] += size[small];
+                sets--;
+            }
+        }
+
+        public int sets() {
+            return sets;
+        }
+    }
 }

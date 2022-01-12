@@ -138,16 +138,21 @@
 如果你一开始所有的样本量是N， 只要你 findHead 这件事情，它的调用次数 到达了O（N）或超过了O（N）（足够频繁），那么单次均摊下来，查询代价O(1)。他有可能某一个时刻花费时间非常长，但是均摊下来非常省。
 说白了，并查集，查询只要到达了样本量这个规模，单次非常的快，就是O（1）.
 ```
-- [并查集实现-哈希表](unionFindSet/UnionFindSet.java): 
+- [并查集实现-哈希表](unionFindSet/UnionFindSet.java): 哈希表实现用于理解，具体做题实现用数组，常数时间小。
   - 建立三个关系映射表：【1】普通元素到包装成对象的节点的映射（从而可以避免元素相同值的问题，转换成对象是为了使用不同对象的地址值各不相同，从而区分每一个节点） 【2】parent表 【3】size表。 
   - 关键点就是 围绕 代表节点（findFather-任意节点的代表节点的查找，isSameSet-判断两个节点代表节点是否相同，union-将小size的代表节点挂到大size的代表节点下面）。
 - [朋友的圈子/省份数量](unionFindSet/NumberOfProvinces.java):
   - https://leetcode-cn.com/problems/number-of-provinces/ . 
   - 数组形式实现并查集。
-- [岛屿数量](unionFindSet/NumOfIslands.java): 
+- [岛屿数量I](unionFindSet/NumOfIslands.java): 
   - 测试链接：https://leetcode.com/problems/number-of-islands/
-  
-
+  - 【1】DFS 【2】并查集（每个位置与左上进行检测） 数组形式实现的并查集 + 哈希表实现的并查集
+- [岛屿数量2](unionFindSet/NumberOfIslandsII.java): 数组形式实现并查集。
+  - https://leetcode.com/problems/number-of-islands-ii/ （付费题） 代码中实现了对数器用于检验正误. 
+  - 给定m和n作为二维数组的row和col。 再给定一个数组positions=[[0,0],[2,1]..]，假设对positions执行addLand操作，依次将数组中的位置设置为1，要求返回 每次addLand后的岛屿数量，以List式返回
+  - 动态添加1的位置并进行合并（要求添加一个检查合并一次，返回sets结果） ==》 使用并查集
+  - 并查集支持动态添加节点
+- [岛屿数量2问题的补充问题](unionFindSet/NumOfIsLandsIIExtra.java): 如果m*n比较大，会经历很重的初始化，而k（positions.length）比较小，怎么优化的方法  =》 字符串拼接+哈希表实现（哈希表只存储有效节点，不会像数组一样存储全部位置），而K比较小，使得虽然哈希表常数操作大，但是总的次数比较少，所以性能损耗小。
 ### TopK
 - [快排方法](topK/quickSort.java):
 
