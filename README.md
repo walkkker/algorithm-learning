@@ -158,7 +158,33 @@
 - [岛屿数量2问题的补充问题](unionFindSet/NumOfIsLandsIIExtra.java): 如果m*n比较大，会经历很重的初始化，而k（positions.length）比较小，怎么优化的方法  =》 字符串拼接+哈希表实现（哈希表只存储有效节点，不会像数组一样存储全部位置），而K比较小，使得虽然哈希表常数操作大，但是总的次数比较少，所以性能损耗小。
 
 ### 图：
-- [图的生成](graph/GraphGenerator.java)：根据给定的邻接矩阵，邻接表或者 [[weight, fromNode, toNode], []]这些方法，转换成空间感强的图结构。
+- [图的生成](graph/GraphGenerator.java)：
+  - 根据给定的邻接矩阵，邻接表或者 [[weight, fromNode, toNode], []]这些方法，转换成空间感强的图结构。
+  - 该生成图的结构包含以下部分，可以将其他表示方法转化成该表示方法： 
+    - Graph： 点集（哈希表实现）: HashMap<Integer, Node> -> <区分值，顶点Node>； 边集 HashSet<Edge>
+    - Node: 顶点代表值（用以区分节点的值） int, 入度 int, 出度 int, 孩子节点List ArrayList<Node>, 从该点出发的边List ArrayList<Edge>
+    - Edge：权值 int， 起始节点Node fromNode, 终止节点Node toNode
+- [BFS](graph/BFS.java): 相较于二叉树的BFS，多添加一个set，防止重复元素进入队列即可（防止环路）。
+- [DFS](graph/DFS.java): 非递归实现（栈（模拟系统栈） + set（防止环路重复元素）），入栈时打印
+- [拓扑排序方法](graph/TopologySort.java): 
+  - DAG有向无环图。 首先从入度为0的节点入手，拓扑序置于前面。然后将节点移除，再次检查拓扑序为0的节点。
+  - inMap(入度表)， zeroInQueue(当入度值为0时，入队)
+- [拓扑排序，lintcode原题](graph/TopologicalOrder2.java)： 
+  - 它给的就是节点，你无法再自创节点
+  - 三种解法: [DFS【点次】](graph/TopologicalOrderDFS1.java) + [DFS【深度】(推荐使用)](graph/TopologicalOrderDFS2.java) + [BFS【统计入度，建立入度表，依次减少入度值】](graph/TopologicalOrderBFS.java)（BFS就是建立入度MAP，依次将入度为0的节点添加到排序列表中） + 记忆化搜索（map设置缓存）
+  - DFS思路大体是，【1】如果 a节点图中节点【点次】>b，那么拓扑序中a<b  【2】深度： a > b,那么拓扑序上 a < b； 
+  - 对于上述思路的补充，如果遇到此题，DFS方法下使用 【深度】的概念。因为如果用【点次】概念存在两个问题：1.节点数量要用long类型 2.比较器处要使用判断语句返回 0，-1，1，不然会报错。只有满足1，2点，方可PASS。
+  - https://www.lintcode.com/problem/topological-sorting
+
+**最小生成树(Minimum Spanning Tree)算法针对无向图。undirected graph only。【图的最小路径和问题】**
+- 最小生成树算法1：[Kruskal算法](graph/Kruskal.java): 
+  - 实现1：本package中的graph定义解法，贪心算法小根堆 + 并查集（HashMap实现） + 遍历边集全部边进小根堆。
+  - 实现2：也可用于二维数组定义的边集,方法与上述相同（依据情况，可以考虑使用数组实现） =》边集数组形式：[[weight1, from1, to1], [weight2, from2, to2]]
+- 最小生成树算法2： [Prim算法](graph/Prim.java)：
+  - 实现1：本package中的graph定义解法：贪心算法小根堆。 点解锁边，边解锁点，依次解锁。
+  - 实现2：邻接矩阵，数组形式实现Prim （复杂一些）
+  
+- [最短路径算法-Dijkestra](graph/Dijkestra.java):
 
 ### TopK
 - [快排方法](topK/quickSort.java):
