@@ -1,17 +1,25 @@
 package graph;
 
 
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.PriorityQueue;
 
-/**
- * 使用 加强堆 实现 Dijkestra算法
- * 时间复杂度 O(N * logN)
+/**方法1最优解：
+ *      使用 加强堆 实现 Dijkestra算法
+ *      时间复杂度 O(M * logN) 》 N为节点数量， M为边的总数量
+ *
+ * 方法2：
+ *      仅使用 PriorityQueue实现，通过添加 visited HashSet 判断 节点是否已经被锁住（被访问过了）
+ *      时间复杂度 为 O(M * log M) -》 N为节点数量， M为边的总数量
  */
-public class Dijkestra {
+public class Dijkstra {
 
+    // 方法1
     // 返回一张哈希表 node，distance
-    public static HashMap<Node, Integer> dijkestra(Node head, int size) {
+    public static HashMap<Node, Integer> dijkstra(Node head, int size) {
         NodeHeap heap = new NodeHeap(size);
         HashMap<Node, NodeRecord> map = new HashMap<>();
         HashMap<Node, Integer> ans = new HashMap<>();
@@ -89,6 +97,9 @@ public class Dijkestra {
 
         public void offer(NodeRecord node) {
             heap[heapSize++] = node;
+            // 不要忘记调整indexMap
+            indexMap.put(node, heapSize - 1);
+
             heapInsert(heapSize - 1);
         }
 
@@ -96,6 +107,8 @@ public class Dijkestra {
             NodeRecord ans = heap[0];
             swap(0, --heapSize);
             heapify(0);
+            // 弹出了 不要忘记调整 indexMap
+            indexMap.put(ans, -1);
             return ans;
         }
 
@@ -136,10 +149,39 @@ public class Dijkestra {
         }
     }
 
+    // 方法二
+    // 仅仅使用 系统提供的堆实现dijkstra， 为了区别 已经确定的节点，所以使用了visited作为HashSet集合。
+    public static HashMap<Node, Integer> dijkstraNew(Node head) {
+        HashSet<Node> visited = new HashSet<>();
+        PriorityQueue<NodeRecord> heap = new PriorityQueue<>(new MyComparator());
+        HashMap<Node, Integer> ans = new HashMap<>();
+        heap.add(new NodeRecord(head, 0));
+        while (!heap.isEmpty()) {
+            NodeRecord record = heap.poll();
+            Node toNode = record.node;
+            int distance = record.distance;
+            if (visited.contains(toNode)) {     // 全局最小肯定也是局部最小
+                continue;
+            }
+            ans.put(toNode, distance);          //弹出时才记录
+            visited.add(toNode);
+            for (Edge edge : toNode.edges) {
+                heap.add(new NodeRecord(edge.to, distance + edge.weight));
+            }
+        }
+        return ans;
+    }
+
+
+    public static class MyComparator implements Comparator<NodeRecord> {
+        public int compare(NodeRecord o1, NodeRecord o2) {
+            return o1.distance - o2.distance;
+        }
+    }
+
+
 
     // TEST
-
-
     public static class NodeHeap1 {
         private Node[] nodes; // 实际的堆结构
         // key 某一个node， value 上面堆中的位置
@@ -243,6 +285,44 @@ public class Dijkestra {
         return result;
     }
 
+    // O(N ^ 2) 暴力方法
+    public static HashMap<Node, Integer> dijkstra3(Node from) {
+        HashMap<Node, Integer> distanceMap = new HashMap<>();
+        distanceMap.put(from, 0);
+        // 打过对号的点
+        HashSet<Node> selectedNodes = new HashSet<>();
+        Node minNode = getMinDistanceAndUnselectedNode(distanceMap, selectedNodes);
+        while (minNode != null) {
+            //  原始点  ->  minNode(跳转点)   最小距离distance
+            int distance = distanceMap.get(minNode);
+            for (Edge edge : minNode.edges) {
+                Node toNode = edge.to;
+                if (!distanceMap.containsKey(toNode)) {
+                    distanceMap.put(toNode, distance + edge.weight);
+                } else { // toNode
+                    distanceMap.put(edge.to, Math.min(distanceMap.get(toNode), distance + edge.weight));
+                }
+            }
+            selectedNodes.add(minNode);
+            minNode = getMinDistanceAndUnselectedNode(distanceMap, selectedNodes);
+        }
+        return distanceMap;
+    }
+
+    public static Node getMinDistanceAndUnselectedNode(HashMap<Node, Integer> distanceMap, HashSet<Node> touchedNodes) {
+        Node minNode = null;
+        int minDistance = Integer.MAX_VALUE;
+        for (Entry<Node, Integer> entry : distanceMap.entrySet()) {
+            Node node = entry.getKey();
+            int distance = entry.getValue();
+            if (!touchedNodes.contains(node) && distance < minDistance) {
+                minNode = node;
+                minDistance = distance;
+            }
+        }
+        return minNode;
+    }
+
     public static void main(String[] args) {
         int[][] matrix = {{2,3,5},
                 {1,7,9},
@@ -255,10 +335,18 @@ public class Dijkestra {
         Graph graph = GraphGenerator.generateGraph(matrix);
         int size = 9;
         Node head = graph.nodes.get(2); // 头节点
-        HashMap<Node, Integer> ans1 = dijkestra(head, size);
+        HashMap<Node, Integer> ans1 = dijkstra(head, size);
         HashMap<Node, Integer> ans2 = dijkstra2(head, size);
+        HashMap<Node, Integer> ans3 = dijkstra3(head);
+        HashMap<Node, Integer> ans4 = dijkstraNew(head);
+
         printMap(ans1);
+        System.out.println();
         printMap(ans2);
+        System.out.println();
+        printMap(ans3);
+        System.out.println();
+        printMap(ans4);
     }
 
 
