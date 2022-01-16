@@ -184,7 +184,28 @@
   - 实现1：本package中的graph定义解法：贪心算法小根堆。 点解锁边，边解锁点，依次解锁。
   - 实现2：邻接矩阵，数组形式实现Prim （复杂一些）
   
-- [最短路径算法-Dijkestra](graph/Dijkestra.java):
+- [最短路径算法-Dijkestra](graph/Dijkestra.java): 基于package的Node，Edge定义的解法。
+  - 方法1最优解(面试，代码较多)：
+      - 使用 加强堆 实现 Dijkestra算法
+      - 时间复杂度 O(M * logN) ==》 N为节点数量， M为边的总数量
+  - 方法2（笔试，代码合理且时间满足）：
+      - 仅使用 PriorityQueue实现，通过添加 HashSet<> visited 判断 节点是否已经被锁住（被访问过了）
+      - 时间复杂度 为 O(M * log M) ==》 N为节点数量， M为边的总数量
+    使用系统提供小根堆 + boolean数组 
+      -整合：boolean 数组用作 确定哪些节点已经被选择; 用 HashSet也可以，但是哈希表常数时间很大
+
+- [x到Y的最短路径](graph/XToYMinDistance.java): dijkstra算法附加问题。 该题是针对【邻接矩阵】的解法。在邻接矩阵中，我们使用系统最大值表示无边。本题使用三种方法实现。
+  - 【1】暴力DFS解法，递归实现.所有路径中最短的路径和。
+  - 【2】Dijkstra 面试方法。 加强堆 实现的过程中，【错误点】因为是矩阵，所以无效边使用系统最大值表示。在由选定节点更新相邻边时，需要加入if语句，只有当边存在时（非最大值）才可以更新record。
+  - **两个注意事项**！：
+    - 1) 不要忘记比较时候比较的是对象的.distance属性，不是heap[i]<heap[(i-1)/2], 而是 heap[i].distance < heap[(i-1)/2].distance
+    - 2) 记得及时调整 indexMap： 三个地方： 1) swap时，对换indexMap； 2）offer时，新元素插入末尾位置，更新indexMap; 3)弹出元素时，将indexMap对应值 设置为 -1，表示进入过但是已经不在堆中
+  - 【3】Dijkstra 笔试方法。 PriorityQueue + boolean数组记录已经选中的点。 笔试面试方法都需要创建 Record对象，将 (node,distance) 两个属性封装在一起。每个Record节点表示当前起始点到node的距离是distance。（面试方法中为每次确定新节点后的最小distance，而笔试方法是随着新节点的确定，生成所有record全部放入小根堆）
+
+### 经典递归
+- [汉诺塔问题](recursionMethodForDP/Hanoi.java)
+
+
 
 ### TopK
 - [快排方法](topK/quickSort.java):
@@ -199,6 +220,12 @@
 
 ### 二叉树
 - [对称二叉树](extraPractice/binaryTree/IsSymmetric.java): 【面试题】一个树的左子树与右子树镜像对称 **->** 两个树在什么情况下互为镜像？ 递归 + 非递归（重要）
-
+- [给定先序中序遍历数组构建二叉树](extraPractice/binaryTree/PreOrderInOrderConstructBT.java): 
+  - https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/
+  - 先序用于寻找头节点，中序基于找到的头结点 可以 计算出 左右子树的 size。 从而就能确定左右子树的，preOrder和inOrder的【双闭区间】
+  - 递归，创建递归函数构建二叉树并返回头节点。 Node process(int[] pre, int L1, int R1, int[] in, int L2, int R2)
+  - 注意： 使用 【HashMap】 来快速定位 inorder 中头节点的位置。不要每次都遍历。 从而将时间复杂度从 O（N*logN）优化到 O（N）。算法题首先优化时间复杂度，在考虑优化空间复杂度。
+  - 中序和后序： https://leetcode-cn.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/
+    - 【错题】（base case, R1L2含义弄混，递归子问题时边界不清）此题不难，但是小变量比较多，为了保证一次性正确率，复习时多做几遍。
 ### 双指针
 - [删除有序数组中的重复项](extraPractice/doublePointer/RemoveDuplicates.java): 【easy,错题】 https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array/ . 【双指针】， 完成区域+无效区域。 错的原因在于题意没理解好。
