@@ -33,24 +33,42 @@
 - [两个数字奇数次，其他数字偶数次](xor/OddTimesEvenTimes2.java)：全部异或后，结果为两数二进制中不同的位置。使用**【a & -a】**得到最右侧的1.从而区分。
 - [奇偶进阶KM问题：arr中，只有一种数出现了K次，其他数都出现了M次](xor/KM.java): KM问题，M > 1,K < M。**O（1）额外空间复杂度。** 包含两个版本： 完整版（包含K次数字不存在情况）及精简版（数组元素严格遵循KM的出现次数）。
 
-### [MergeSort扩展问题](mergeSortRelatedQuestions)：都可以扩展为 数组中 每个元素 左侧范围/右侧范围 大/小 的相关问题， 最终整合整个数组结果 的问题（但是注意，最终都要转换为类似，对于左组的**每一个元素**，右组所满足要求元素的 **个数**）。思路：当问题问 关于数组中每一个数，右边怎么怎么样的时候， 就可以往mergeSort上靠！ 本质：mergeSort把比较信息变成了有序的东西，这个有序的东西可以帮助很快的求很多事情。
-- [小和 问题](mergeSortRelatedQuestions/SmallSum.java)：**关注 【右侧范围】 有多少个数 比当前元素 大** ：给定一个数组，对数组中每个元素arr[i]，计算其左侧元素arr[j]满足(j < i && arr[j] < arr[i])的所有元素累加和，最终计算出整体数组对应的总累加和。每一个数左边比它小的数字之和 -》每一个数字右边有**多少个**比它大的数字。
-  从左往右进行比较，左组元素拷贝的时候计算右组个数。注意：左右组相等时，先拷贝右边
-- [逆序对问题](mergeSortRelatedQuestions/ReversePair.java)：**关注 【右侧范围】 有多少个数 比当前元素 小** https://leetcode-cn.com/problems/shu-zu-zhong-de-ni-xu-dui-lcof/ 。从右往左进行拷贝，依然是 左组元素拷贝的时候，计算右组个数。注意：左右组相等时，先拷贝右边。
-- 【小和问题】 + 【逆序对问题】 -》 mergeSort过程中，只计算每一个元素作为**左组姿态**（123x|456789, 则对于x，456789将会是 x作为左组姿态下 遇到的右组总和），求右组的数量情况时，最终结果即为 在整个数组范围上，该元素 右侧所有元素的情况。**换句话说，该元素在 左组姿态的情况下， “456789”右侧【全部数字】 都会在 过程中的 【右组】中【仅有一次】的出现。**  
-  **下面的两个问题**，因为是【非元素本身】之间进行比较了，所以 将 【计算过程】 与 【Merge过程】 分开即可。
-- [大于两倍问题 - BiggerThanRightTwice](mergeSortRelatedQuestions/BiggerThanRightTwice.java): Q： 求每一个数num 右边有多少个数*2之后 <num。**类似 逆序对 问题（一个元素 右侧范围中 小于当前元素个数），但是coding方式变了：** **小和问题和逆序对问题由于是直接比较，所以可以在merge左右组的时候 *同时* 进行计算**，而"大于右侧两倍"问题，**则只需要将 计算部分（for循环遍历左组，对于每一个【i】使用while循环找到满足条件的右组边界） 与 merge左右组部分 分开 即可**。  
-  PS：涉及一个技巧：双指针（指向左右组的开头） 不回退的技巧（因为左组有序，右组有序，所以必然不回退）， 时间复杂度O（N）。**说明一点：**不回退技巧**来自于 **单调性**（【单调性】往往伴随着【不回退】），因为左组小到大单调，右组也有序，所以比较左右组时可以不回退。
-- [区间和的个数](mergeSortRelatedQuestions/CountOfRangeSum.java)： https://leetcode.com/problems/count-of-range-sum/ 。 **转换为 必须以每个元素为结尾时，满足区间和的数量。** 转换为 左侧范围中，满足转换后区间和的元素数量。 =》 前缀和，单调性+滑动窗口+指针不回退技巧，关键点变成：求每一个元素**左侧范围**中满足 转换后区间和的数量。（mergeSort就是会让每个元素作为右组姿态下，在merge左组的过程中经历其左侧范围的每个元素仅有一次） 。  我要左侧的数字，那我就 遍历右组元素的时候，算左组个数。
- PS: 转换为 以每个元素为结尾，就变成了 求 左侧 的问题。 区间和 == 前缀和。  
+### [MergeSort扩展问题](mergeSortRelatedQuestions)：
+```
+都可以扩展为 数组中 每个元素 左侧范围/右侧范围 大/小 的相关问题， 
+最终整合整个数组结果 的问题（但是注意，最终都要转换为类似，对于左组的**每一个元素**，
+右组所满足要求元素的 **个数**）。思路：当问题问 关于数组中每一个数，右边怎么怎么样的时候， 
+就可以往mergeSort上靠！ 本质：mergeSort把比较信息变成了有序的东西，这个有序的东西可以帮助很快的求很多事情。
+```
+- [小和 问题](mergeSortRelatedQuestions/SmallSum.java)：
+  - **关注 【右侧范围】 有多少个数 比当前元素 大** ：给定一个数组，对数组中每个元素arr[i]，计算其左侧元素arr[j]满足(j < i && arr[j] < arr[i])的所有元素累加和，最终计算出整体数组对应的总累加和。每一个数左边比它小的数字之和 -》每一个数字右边有**多少个**比它大的数字。
+  - 从左往右进行比较，左组元素拷贝的时候计算右组个数。注意：左右组相等时，先拷贝右边
+- [逆序对问题](mergeSortRelatedQuestions/ReversePair.java)：
+  - **关注 【右侧范围】 有多少个数 比当前元素 小** https://leetcode-cn.com/problems/shu-zu-zhong-de-ni-xu-dui-lcof/ 。从右往左进行拷贝，依然是 左组元素拷贝的时候，计算右组个数。注意：左右组相等时，先拷贝右边。
+  - 【小和问题】 + 【逆序对问题】 -》 mergeSort过程中，只计算每一个元素作为**左组姿态**（123x|456789, 则对于x，456789将会是 x作为左组姿态下 遇到的右组总和），求右组的数量情况时，最终结果即为 在整个数组范围上，该元素 右侧所有元素的情况。**换句话说，该元素在 左组姿态的情况下， “456789”右侧【全部数字】 都会在 过程中的 【右组】中【仅有一次】的出现。**  
+**下面的两个问题**，因为是【非元素本身】之间进行比较了，所以 将 【计算过程】 与 【Merge过程】 分开即可。
+- [大于两倍问题 - BiggerThanRightTwice](mergeSortRelatedQuestions/BiggerThanRightTwice.java): 
+  - Q： 求每一个数num 右边有多少个数*2之后 <num。**类似 逆序对 问题（一个元素 右侧范围中 小于当前元素个数），但是coding方式变了：** **小和问题和逆序对问题由于是直接比较，所以可以在merge左右组的时候 *同时* 进行计算**，而"大于右侧两倍"问题，**则只需要将 计算部分（for循环遍历左组，对于每一个【i】使用while循环找到满足条件的右组边界） 与 merge左右组部分 分开 即可**。  
+  - PS：涉及一个技巧：双指针（指向左右组的开头） 不回退的技巧（因为左组有序，右组有序，所以必然不回退）， 时间复杂度O（N）。**说明一点：**不回退技巧**来自于 **单调性**（【单调性】往往伴随着【不回退】），因为左组小到大单调，右组也有序，所以比较左右组时可以不回退。
+- [区间和的个数](mergeSortRelatedQuestions/CountOfRangeSum.java)： 
+  - https://leetcode.com/problems/count-of-range-sum/ 。 
+  - **转换为 必须以每个元素为结尾时，满足区间和的数量。** 转换为 左侧范围中，满足转换后区间和的元素数量。 =》 前缀和，单调性+滑动窗口+指针不回退技巧，关键点变成：求每一个元素**左侧范围**中满足 转换后区间和的数量。（mergeSort就是会让每个元素作为右组姿态下，在merge左组的过程中经历其左侧范围的每个元素仅有一次） 。  我要左侧的数字，那我就 遍历右组元素的时候，算左组个数。 
+  - PS: 转换为 以每个元素为结尾，就变成了 求 左侧 的问题。 区间和 == 前缀和。  
   **【注意事项】** [注意前缀和数组值溢出问题](https://leetcode-cn.com/problems/count-of-range-sum/solution/qu-jian-he-wen-ti-qian-zhui-he-gui-bing-1u7x9/) !!! 题目给定 单个元素范围 【-2^31 <= nums[i] <= 2^31 - 1】，所以正常方式求 【前缀和】时 要使用【Long类型】进行存储。
 ### linkedList:链表相关问题（笔试时可以优先使用HashSet或HashMap来实现，面试时则使用额外空间复杂度为O（1）的方法。）
-- [反转链表](linkedList/ReverseLinkedList.java)： 递归 + 非递归
-- [删除给定值的节点](linkedList/DeleteGivenValue.java)：可能位于开头（分别考虑），可能位于中间。
-- [链表 中位数](linkedList/LinkedListMid.java)： 快慢指针： 上中+中， 下中+中， 上中前+中前， 下中前+中前
-- [是否是回文链表](linkedList/IsPalindromeList.java)： 判断一个链表value是否是回文的。回文代表 正着读反着读结果相同。O（N）栈，逆序。面试需 O（1）空间复杂度：取中位节点，后半部分逆序，头尾指针向中移动，沿途判断是否相等。
-- [将链表中的数字 分为 【小中大】 三部分](linkedList/SmallEqualBigger.java)： O(1)额外空间复杂度，分成小中大三个list，总共六个首尾指针，最后进行整合
-- [CopyListWithRandom,带有random指针的链表复制](linkedList/CopyListWithRandom.java)： O（1）额外空间复杂度：1 1‘ 2 2’ 3 3‘。https://leetcode.com/problems/copy-list-with-random-pointer/
+- [反转链表](linkedList/ReverseLinkedList.java)： 
+  - 递归 + 非递归
+- [删除给定值的节点](linkedList/DeleteGivenValue.java)：
+  - 可能位于开头（分别考虑），可能位于中间。
+- [链表 中位数](linkedList/LinkedListMid.java)： 
+  - 快慢指针： 上中+中， 下中+中， 上中前+中前， 下中前+中前
+- [是否是回文链表](linkedList/IsPalindromeList.java)： 
+  - 判断一个链表value是否是回文的。回文代表 正着读反着读结果相同。O（N）栈，逆序。面试需 O（1）空间复杂度：取中位节点，后半部分逆序，头尾指针向中移动，沿途判断是否相等。
+- [将链表中的数字 分为 【小中大】 三部分](linkedList/SmallEqualBigger.java)： 
+  - O(1)额外空间复杂度，分成小中大三个list，总共六个首尾指针，最后进行整合
+- [CopyListWithRandom,带有random指针的链表复制](linkedList/CopyListWithRandom.java)： 
+  - O（1）额外空间复杂度：1 1‘ 2 2’ 3 3‘。
+  - https://leetcode.com/problems/copy-list-with-random-pointer/
 - [给出任意两个链表头节点，返回相交节点](linkedList/FindFirstIntersectNode.java)：此类问题笔试方法为HashSet，空间复杂度为O(N)。下列为面试方法，空间复杂度优化为**O(1)**。该大问题下包含以下四个小问题。
   - 【0】获得链表第一个入环节点（无则返回null）： 快慢指针 O(1)额外空间复杂度，快慢指针一起走第一次相遇时停止。slow不动，fast从head重走，此时slow,fast全部步长为1，第一个相遇节点即为相交节点。
   - 【1】两个无环链表相交节点： O(1)额外空间复杂度，通过两个链表最后一个节点判断是否存在相交。有的话，先走长链表多余部分，然后长短链表一起走，第一个相同节点即是相交节点
@@ -60,22 +78,38 @@
     - （3）两个链表的入环节点都在环上，但不同位置 
     - （4）无相交节点 
   - 【3】一个有环链表与一个无环链表不可能相交 
-- [ReverseNodesInKGroup - K个一组翻转链表](linkedList/ReverseNodesInKGroup.java)： https://leetcode.222com/problems/reverse-nodes-in-k-group/ 。 讲究代码设计，涉及到 链表反转函数设计（实现 给定head,tail的范围部分，实现链表反转）
-- [AddTwoNumbers](linkedList/AddTwoNumbers.java)： https://leetcode.com/problems/add-two-numbers/ 。 使用较长链表作为返回链表。 使用"%" + "/"计算当前节点值和进位值。 **经历三个阶段**： 1.短链表走完 2. 长链表剩余部分走完 3. 最后元素是否有进位，决定是否创建新节点
-- [合并两个有序链表-MergeTwoSortedLinkedList](linkedList/MergeTwoSortedLinkedList.java)： https://leetcode.com/problems/merge-two-sorted-lists 。
-- [合并K个有序链表-MergeKSortedLists](linkedList/MergeKSortedLists.java)： https://leetcode.com/problems/merge-k-sorted-lists/ 使用优先级队列，小根堆
+- [ReverseNodesInKGroup - K个一组翻转链表](linkedList/ReverseNodesInKGroup.java)：
+  - https://leetcode.222com/problems/reverse-nodes-in-k-group/ 。 
+  - 讲究代码设计，涉及到 链表反转函数设计（实现 给定head,tail的范围部分，实现链表反转）
+- [AddTwoNumbers](linkedList/AddTwoNumbers.java)：
+  - https://leetcode.com/problems/add-two-numbers/ 。 
+  - 使用较长链表作为返回链表。 使用"%" + "/"计算当前节点值和进位值。 
+  - **经历三个阶段**： 1.短链表走完 2. 长链表剩余部分走完 3. 最后元素是否有进位，决定是否创建新节点
+- [合并两个有序链表-MergeTwoSortedLinkedList](linkedList/MergeTwoSortedLinkedList.java)： 
+  - https://leetcode.com/problems/merge-two-sorted-lists 。
+- [合并K个有序链表-MergeKSortedLists](linkedList/MergeKSortedLists.java)： 
+  - https://leetcode.com/problems/merge-k-sorted-lists/ 使用优先级队列，小根堆
 
 ### QueueImplementation:队列实现
-- [单链表实现队列](queueImplementation/LinkedListToQueue.java)： 尾插法 （先进先出，后进后出）: 在poll函数中，注意一个场景，当size==1时出队后，此时head==null,要同时调整tail=null。所以，**要在每次poll函数调用出队元素后中，检查是否head==null，从而决定是否调整tail.
-- [RingArray数组实现队列](queueImplementation/RingArrayToQueue.java)：offeri, polli, **size**控制offeri,polli之间的关系
-- [两个栈实现队列](queueImplementation/TwoStackImplementQueue.java)： pushStack,popStack + pushToPop()保证只有当popStack为空时，就将pushStack中的所有元素全部pop到popStack中去
+- [单链表实现队列](queueImplementation/LinkedListToQueue.java)： 
+  - 尾插法 （先进先出，后进后出）: 在poll函数中，注意一个场景，当size==1时出队后，此时head==null,要同时调整tail=null。所以，**要在每次poll函数调用出队元素后中，检查是否head==null，从而决定是否调整tail.
+- [RingArray数组实现队列](queueImplementation/RingArrayToQueue.java)：
+  - offeri, polli, **size**控制offeri,polli之间的关系
+- [两个栈实现队列](queueImplementation/TwoStackImplementQueue.java)： 
+  - pushStack,popStack + pushToPop()保证只有当popStack为空时，就将pushStack中的所有元素全部pop到popStack中去
 
 ### StackImplementation:栈的实现
-- [单链表实现栈](stackImplementation/LinkedListToStack.java)： 头插法 （后进先出，先进后出）.单链表实现队列也好，单链表实现栈也好，都要注意 push时，考虑 空(head==null)/非空 两种情况！！！ 并且size!
-- [数组实现栈](): 不具体实现了。只需要一个变量size, size既表示 当前stack中元素数量，也表示要新插入元素的位置。 [0, size),push时，arr[size++] = value; 弹出时，return arr[--size]
-- [一个队列实现栈](stackImplementation/OneQueueImplementStack.java): 入队元素前面所有元素 出队， 重新入队，从而实现后进先出
-- [两个队列实现栈](stackImplementation/TwoQueueImplementStack.java)： queue和help， 引用对换
-- [最小栈](stackImplementation/GetMinStack.java)：https://leetcode-cn.com/problems/min-stack/ O（1）从栈中获得最小值. 创建两个栈，dataStack（存储原始数据），minStack辅助栈，所有 <= 栈顶的元素 都加到minStack中
+- [单链表实现栈](stackImplementation/LinkedListToStack.java)： 
+  - 头插法 （后进先出，先进后出）.单链表实现队列也好，单链表实现栈也好，都要注意 push时，考虑 空(head==null)/非空 两种情况！！！ 并且size!
+- [数组实现栈](): 
+  - 不具体实现了。只需要一个变量size, size既表示 当前stack中元素数量，也表示要新插入元素的位置。 [0, size),push时，arr[size++] = value; 弹出时，return arr[--size]
+  - 我们在并查集部分，数组实现并查集部分，就是使用 数组 实现的模拟栈。
+- [一个队列实现栈](stackImplementation/OneQueueImplementStack.java): 
+  - 入队元素前面所有元素 出队， 重新入队，从而实现后进先出
+- [两个队列实现栈](stackImplementation/TwoQueueImplementStack.java)： 
+  - queue和help， 引用对换
+- [最小栈](stackImplementation/GetMinStack.java)：
+  - https://leetcode-cn.com/problems/min-stack/ O（1）从栈中获得最小值. 创建两个栈，dataStack（存储原始数据），minStack辅助栈，所有 <= 栈顶的元素 都加到minStack中
 
 ### dequeImplementation:双端队列实现
 - [双向链表实现双端队列+双端队列实现队列和栈](dequeImplementation/DoubleLinkedListToDeque.java):
@@ -204,6 +238,8 @@
 
 ### 经典递归
 - [汉诺塔问题](recursionMethodForDP/Hanoi.java)
+- [打印一个字符串的全部子序列](): 子序列是可以不连续的字符元素。
+- [打印一个字符串的全部子序列，要求不要出现重复字面值的子序列]
 
 
 
