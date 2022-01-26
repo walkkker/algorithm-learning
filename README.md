@@ -273,6 +273,116 @@
                题目想要的是栈底元素的值，所以我们可以先弹出元素，然后查看此时stack是否为空，为空，则返回弹出元素（栈底元素）的值；否则，按照普通递归情况处理。
     ```
 
+### 暴力递归到动态规划
+#### 从左往右的尝试模型
+- [RobotWalk - 机器人走路的方案数](dp/RobotWalk.java): 剩余步数K， 一步一步减小，最终为0.
+  - 总共N步，对于当前步数位于i，则下一步为i+1，直至i==N+1;【从左至右的递归】
+  - 【错误点】递归函数的base case处理情况错误，具体情况见代码。 总结：在base case条件分支中，其含义只是能够直接得到答案的终止条件，但是 其返回值以及这个case都要满足process递归函数本身的含义。这样才能保证正确。   +   dp[][] 返回值需要的参数不要弄混了
+  - 第三种方法： 进一步优化： **空间压缩** -> 一维数组
+- [背包问题](dp/Knapsack.java): 货物数量K(0~K-1)，从左至右一个一个检查，最终i==K;
+  - https://www.lintcode.com/problem/125/
+  - i 为数组对应的下标。 对于每一个i，可以选择 要/不要，直至i==N，【从左至右的递归】。并且，【要和不要】不是死的，很多时候是要判断 是否能够 【要或者不要】。
+  - 空间压缩 -> 一维数组
+- [把数字翻译成字符串](dp/ConvertToLetterString.java): 
+  - https://leetcode-cn.com/problems/ba-shu-zi-fan-yi-cheng-zi-fu-chuan-lcof/ . “把数字翻译成字符串”
+  - 对于每一个i或（i, i+1）的pair，直至 i == N， 从左至右的递归
+  - 【错误点】 1) base case 返回值。 并且经尝试，base case 必须是 i==length，不能是i==length-1。 返回值要为1.
+  - 【错误点】 2) 在暴力递归转动态规划的过程中，if else 没有理清楚。 暴力递归可以不那么清晰写if-else是因为有些if语句中有return语句。 而改成动态规划的过程中，因为没有返回return了改成了dp[i]，由于只允许走一条分支，所以必须补上 if - else；说白了，创建条件分支结构时，没有必要非要省if-else，先保证结果的正确性
+- [贴纸拼词](dp/StickersToSpellWord.java): 
+  - 初始时，输入字符串String s, 每经过一次贴纸， 就变成了 s-sticker，最终变为 ""空字符串，从左至右的尝试。
+  - 无法使用dp，使用 记忆化搜索即可达到最优解。化(用词频
+  - 核心： 【1】字符的减法 使用 词频统计来进行减法。 **关键优表替代贴纸数组)**
+  - 【2】针对单一变量 为 String类型， 做到 记忆化搜索即可，使用哈希表进行存储,傻缓存。
+- [整数拆分问题](dp/SplitNumber.java): 
+  - 给定一个整数N， 求裂开的方法数。
+- [最小路径和](dp/MinPathSum.java):
+  - 暴力递归
+  - 快速转换dp
+  - 空间压缩，二维转一维
+
+
+#### 范围上（缩小范围）的尝试模型 ： 特别在意讨论 【开头如何如何，结尾如何如何】 + 开头与结尾共同的可能性/ **左下半区不需要考虑，无效**
+- [CardsInLine - 纸牌博弈问题](dp/CardsInLine.java):
+  - https://leetcode-cn.com/problems/predict-the-winner/
+  - 博弈问题，先手后手问题，涉及两张dp表。 官方解答可以优化成一张dp表
+- [最长回文子序列](dp/LongestPalindromeSubseq.java):
+  - https://leetcode-cn.com/problems/longest-palindromic-subsequence/
+  - 暴力递归： 【错误点】str[i] == str[j]时， return 【2】 + process(剩余部分)。 这里主要要加2，因为确定了两个子序列的字符。当时没想清楚直接写了1. 注意这个小错误。
+  - 二维动态规划
+  - 一维数组动态规划： 空间压缩。 最优解。  多多复习，如何改的。
+- [跳马问题](dp/HorseJump.java): 三维表
+  - 从棋盘(0,0)出发，到指定点(x,y)，在K步走到 的方法数
+
+#### 多样本位置全对应的尝试模型 ： 特别在意讨论 【两个样本】的【结尾/开头】如何如何
+- [最长公共子序列](dp/LongestCommonSubsequences.java):
+
+
+#### 寻找业务限制的尝试模型:
+```
+(1) 如果递归参数中，有一个可变参数的范围你不知道，那么就按照最差情况看一下能够冲多大，来估计范围
+(2) 很重要！： 一定要关心 **哪些范围是不需要填的** （有些位置 一定不会被递归调到，从而也无法计算，从而也不用填）。
+```
+- [咖啡机的最短时间](dp/Coffee.java):
+  - 当可变参数模型估计不出来时，那业务最差情况估计（某些情况下拿平凡解估计）
+  - 因为dp是 严格表结构的东西，不一定递归里面都会调用到，一定要关心哪些位置是不需要的，不需要的位置不需要填。 
+  - 分为两个问题： 【1】贪心算法+小根堆（以完成时间最早为指标）   【2】记录每一个顾客最早喝完咖啡的数组后，从左往右尝试模型，每一个咖啡是wash OR air.
+#### 斜率优化（优化枚举行为）
+- [给定一个整数n， 求裂开的方法数](dp/SplitNumber.java):
+  - 方法1： 暴力递归。 并且增加了一个功能： 将 满足条件的路径 使用回溯法 添加到list里面，从而可以查看结果的正确性
+  - 方法2： 普通 暴力递归改dp
+  - 方法3： 斜率优化版本， 将【枚举行为】 变为 有限个元素的计算
+  - 方法4： 斜率优化 + 空间压缩 =》 减少时间复杂度，并将二维dp表压缩为一维dp表
+  - PS: 代码中 有一个剪枝操作，应为【for (int i = index; i <= rest; i++)】，我在原答案中没有更改这个点，但是在暴力递归部分标注了出来，复习时候注意这个错误点并搞清楚为何可以剪枝。
+  - 此外，还有一个剪枝点，就是 整个数组的左下半部 不需要 计算
+
+#### 货币面值系列问题（各有侧重点，循序渐进， 状态压缩类型题）
+- [CoinsWayEveryPaperDifferent](dp/coinsSeries/CoinsWayEveryPaperDifferent.java):
+  - 求方法数  
+  - 数组中包含重复元素，认为相同值的元素都是不相同的。
+  - 背包问题
+- [CoinsWayNoLimit](dp/coinsSeries/CoinsWayNoLimit.java):
+  - https://leetcode-cn.com/problems/coin-change-2/
+  - 求方法数
+  - 数组中面值不同，每种面值都认为有无穷张，相同面值看做相同元素
+  - 特别注意，状态压缩之后，有可能，随着位置依赖的改变， dp表的更新方向也会发生改变。不然会出错！！！
+  - 单纯空间压缩时，不需要改变 for 循环顺序
+- [CoinsWaySameValueSamePaper](dp/coinsSeries/CoinsWaySameValueSamePapper.java):
+  - 求方法数
+  - 数组中有重复值，重复值认为是相同的纸币
+  - 综合前两问的最后进阶一问
+  - **【错误，中上】** 很多错误点，全部代码中函数waysDpPro标注，集中在 进行 状态压缩+斜率优化上面，注意复习重做
+  
+- [MinCoinsNoLimit](dp/coinsSeries/MinCoinsNoLimit.java): 最少的硬币个数
+  - https://leetcode-cn.com/problems/coin-change/
+  - 【错误点】 1. 题目要求 无效返回-1，我却 直接将 自己设置的无效值返回，没有进行判断
+  - 【2】很重要的一点：**在从递归 改成 状态压缩，空间压缩的过程中。 注意 如果递归中出现无效值的判断，那么 改之后的dp 不仅要对 下标边界进行判断，还要对 递归中对无效值的判断 进行判断，千万不要漏掉！！**
+  - **【3】此外，一定要注意有效无效的判断: 在 base case中的 无效值，要与 正常情况下 也会产生的 默认值 （设为无效值），两者无效值要相同。 这样才能对每一个位置 做出准确的是否有效无效的判断。 建议都设为 MAX_VALUE， 或者 MIN_VALUE；详情见 LC上的错误提交**
+-------------------------------------------------
+
+将数组中的数字分为两组相关问题：
+- [SplitSumClosed]():
+  
+- [SplitSumClosedSizeHalf]():
+
+#### 概率类问题
+- [ “马”在棋盘上的概率](dp/KnightProb.java):
+  - https://leetcode-cn.com/problems/knight-probability-in-chessboard/
+  - 两种方向：【1】统计马在边界外 【2】统计马在边界内。 【1】需要对边界外的情况进行剪枝，需要额外计算 【2】直接计算递归返回的个数即可
+  - 选择【2】，将问题转化成，** K步之后，马留在棋盘内的 次数**
+  - 【错误点，卡了很久】： int（+-10^9）和long(+-10^18)都不够大，要使用**double类型**才可以 包含 累加起来的和
+
+- [BobDie]():
+
+- [KillMonster]():
+
+
+### 回溯
+- [组合](backtracking/Permutation.java):
+  - https://leetcode-cn.com/problems/combinations/ .
+  - 这道题是帮助认识回溯的。 但是在最优解方面有一些点可以注意，如剪枝，数据结构的灵活使用，详细见代码。
+- [全排列](backtracking/Permutation.java):
+  - https://leetcode-cn.com/problems/permutations/
+  - 与 字符串的全排列基本解法相同
 
 ### TopK
 - [快排方法](topK/quickSort.java):
@@ -286,7 +396,7 @@
 - [二叉搜索树与双向链表](extraPractice/linkedList/TreeToDoublyList.java): https://leetcode-cn.com/problems/er-cha-sou-suo-shu-yu-shuang-xiang-lian-biao-lcof/【错题，经典】 1. 使用到了全局变量，head,pre 2.灵活运用了 中序递归遍历，值得到代码中学习思路
 
 ### 二叉树
-- [对称二叉树](extraPractice/binaryTree/IsSymmetric.java): 【面试题】一个树的左子树与右子树镜像对称 **->** 两个树在什么情况下互为镜像？ 递归 + 非递归（重要）
+- [对称二叉树](extraPractice/binaryTree/IsSymmetric.java): **【面试题】**一个树的左子树与右子树镜像对称 **->** 两个树在什么情况下互为镜像？ 递归 + 非递归（重要）都需要实现
 - [给定先序中序遍历数组构建二叉树](extraPractice/binaryTree/PreOrderInOrderConstructBT.java): 
   - https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/
   - 先序用于寻找头节点，中序基于找到的头结点 可以 计算出 左右子树的 size。 从而就能确定左右子树的，preOrder和inOrder的【双闭区间】
@@ -296,3 +406,50 @@
     - 【错题】（base case, R1L2含义弄混，递归子问题时边界不清）此题不难，但是小变量比较多，为了保证一次性正确率，复习时多做几遍。
 ### 双指针
 - [删除有序数组中的重复项](extraPractice/doublePointer/RemoveDuplicates.java): 【easy,错题】 https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array/ . 【双指针】， 完成区域+无效区域。 错的原因在于题意没理解好。
+
+### 二分法
+#### 旋转数组问题：
+```
+总流程相同：
+【1】二分法 【2】分类讨论
+框架步骤：（此处L M R，对应 arr[L] arr[M] arr[R]）
+  （1）重复条件下必须包含，不重复条件可以不包含： L == M == R的情况， 此时 无法确定哪一侧有序，哪一侧舍弃。
+  （2）接下来，不管重复不重复都包含三种小讨论：
+                    1） L == M 的情况： L = M + 1 （当然啦，原因不同，e.g.不重复情况下代表L与M重合，所以右移）
+                    2） L < M, 左侧有序，左范围区间为 [L, M]
+                    3） L > M, 右侧有序， 右范围区间为 [M, R]
+```
+- [搜索旋转排序数组](extraPractice/binarySearch/SearchInRotateArray.java): 【面试题】 【错误点，边界条件没有理清】 **【重复练习】**
+  - 核心点：**比较mid 和 L 不同时，就是一定每次都有一侧有序**，每次找到有序的一半，进行检查，从而可以 每次实现二分。
+  - 数字各不相同的版本 V1： https://leetcode-cn.com/problems/search-in-rotated-sorted-array/
+    - 三种情况： 第一次答题，都没有分析清楚
+      - 【1】nums[L] == nums[mid] => L 与 mid重合，因为mid 不是target， L右移; 
+      - 【2】nums[L] < nums[mid]  => 左区间有序，判断 target是否在 区间 [nums[L], nums[mid]) 中。 【错误点】，一开始使用了(),没有包含 nums[L]. 下同
+      - 【3】nums[L] > nums[mid]  => 右侧区间有序，判断 target 是否在 区间 (nums[mid], nums[R]], 左开右闭区间
+  - 带有重复元素，判断是否存在版本 V2： https://leetcode-cn.com/problems/search-in-rotated-sorted-array-ii/
+  - 带有重复元素版本 V3： https://leetcode-cn.com/problems/search-rotate-array-lcci/
+    - **重复元素返回最小下标对应的target**  考虑最周全的版本
+    - 第一个点：通过一开始检验 【0】 下标的元素，保证了 不会出现找右侧区间后，但是被舍弃掉的左侧区间也有答案的情况。因为要是存在这种情况，必定会N-1与0相连，此时0必是最小。检查一下就可以。
+    - 第二个点就是 【取 >= N的最左 套路】。 这里只是改成了 == 情况下，才收集答案并缩小右边界 向【左区间】再次寻找，记得continue或if-else，直接跳转下一轮。
+
+- [寻找旋转数组最小值](): 还是 【分类讨论】。
+  - 寻找旋转排序数组中的最小值 V1： https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array/description/
+  - 旋转数组的最小数字 V2： https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array-ii/
+### 图论
+- [01随机矩阵，求左上角到右下角最少1的路径中的1的个数，每个节点可以走向四个方向](extraPractice/maze/MinOnes.java): **【面试】**
+  - 方法1： DFS + 回溯 解决题目。 完全的 暴力搜索 （目前认为无法动态规划）
+  - 方法2: 比方法1优秀很多。 使用Dijkstra算法求 【有权图】 两点间最短路径 （自创节点及使用小根堆）。具体见代码
+- [跳跃游戏 IV]():
+  - https://leetcode-cn.com/problems/jump-game-iv/
+  - **BFS 针对 没有权值或权值都相等的图，求最短距离**。 优于DFS暴力搜索。
+  
+### 数字反转回文字符串转换问题： 有固定套路
+- [整数反转](extraPractice/reverseInteger/ReverseInt.java): **【必须直接背过】**
+  - https://leetcode-cn.com/problems/reverse-integer/
+  - 需要充分理解这段功能代码的 功能。 比如， 223000 只返回 322，就是说，会忽略 结尾0的部分。 该功能与后面题目有关。
+- [回文数](extraPractice/reverseInteger/isPalindrome.java):
+  - https://leetcode-cn.com/problems/palindrome-number/
+  - 注意： 负数 无法组成 【回文数】，false
+  - Solution1（具体看代码注释）: 仅使用一半的数字 进行判断回文（注意奇数偶数的分情况讨论）； 需要特殊判断 10的倍数的数字（10的倍数一定不回文，但是会被判断成回文），且注意 0 的问题
+  - Solution2: 次优法： 全部反转，然后比较两者是否相同。 注意条件判断是否溢出的位置
+- [字符串转换整数]():
