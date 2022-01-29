@@ -359,23 +359,33 @@
   - **【3】此外，一定要注意有效无效的判断: 在 base case中的 无效值，要与 正常情况下 也会产生的 默认值 （设为无效值），两者无效值要相同。 这样才能对每一个位置 做出准确的是否有效无效的判断。 建议都设为 MAX_VALUE， 或者 MIN_VALUE；详情见 LC上的错误提交**
 -------------------------------------------------
 
-将数组中的数字分为两组相关问题：
-- [SplitSumClosed]():
-  
-- [SplitSumClosedSizeHalf]():
+最接近目标值的子序列和系列问题： 一定要注意，动态规划解法 必须 都是  正数数组！！！！ 负数的是别的题目和解法
+- [SplitSumClosed](dp/splitSumClosed/SplitSumClosed.java):
+  - 分成两个数组，使两个数组之间的绝对值最小
+  - 【错误点】![img.png](images/img.png)  直接进行 状态压缩的过程中，没有结合递归 在比较时加上arr[index]。 原因： （1）递归中有效无效没有clear 很清 （2）一定要 搞明白递归中有效无效的处理情况，从而在dp表中，有效是 如何处理。因为有时不仅仅是单纯拿该值，有时还要在该值上进行 加减别的值。
 
-#### 概率类问题
+- [SplitSumClosedSizeHalf](dp/splitSumClosed/SplitSumClosedSizeHalf.java):
+  - 分成两个数组，要求两个数组的长度相同，且实现 两个数组的差的绝对值最小
+  - LC为偶数情况。 代码中也实现了 针对任意奇偶输入的 实现方法，
+  - 为了快速写的话，可以直接 转dp，因为有时三维表不好看
+
+
+#### 概率类问题: 因为组合数（或称为满足要求的 数量）可能存在很大的情况，记住使用 【long类型】的dp数组或【double类型】的【数组】和 【变量】 来存储最终的满足条件的 数量。 / 最终结果不要忘了 转 (double)
 - [ “马”在棋盘上的概率](dp/KnightProb.java):
   - https://leetcode-cn.com/problems/knight-probability-in-chessboard/
   - 两种方向：【1】统计马在边界外 【2】统计马在边界内。 【1】需要对边界外的情况进行剪枝，需要额外计算 【2】直接计算递归返回的个数即可
   - 选择【2】，将问题转化成，** K步之后，马留在棋盘内的 次数**
   - 【错误点，卡了很久】： int（+-10^9）和long(+-10^18)都不够大，要使用**double类型**才可以 包含 累加起来的和
 
-- [BobDie]():
-
-- [KillMonster]():
-
-
+- [BobDie](dp/BobDie.java):
+  - 直接计算 Bob 存活的 次数， 除以总的可能性 Math.pow(4, k); 含义： 每个点有四种可能性（上下左右），总共走K步， 那么递归树展开后，总的可能性为 4^k。
+  - 【错误点，写边界条件时 注意 && 与 || 不要用混了】
+  - 【错误点】  应该直接return dp[x][y][rest]，但是返回了 dp[x][y][rest - 1]，脑子笨了。 搞明白， pick函数只是 用以检查 对应的输入参数 是否可以从 dp表中 取得目标值。如果超过了dp表的范围，那么返回0 （递归函数中限定）； 没有超过的话（合法的话），**直接按照 传入的 参数 从dp表取值，不需要修改。**
+  - 续： 需要注意的是，二维DP表的话，pick的可变参数就改为两个x+y；  如果是三个可变参数的话（三维dp表），那么 pick函数 传入的参数 就应该为 这三个x,y,z。
+- [KillMonster](dp/KillMonster.java):
+  - 计算怪兽k刀之后活下来的概率p  =》 1 - p 即为 K到之后 怪兽砍死的概率。
+  - 【错误点】 代码中都有记录，需要看。 小总结，递归改dp，如果递归成功，dp要严格依赖递归所制定的规则。 所以在这种情况下
+  - 续：递归尽量做到两点： 【1】清晰简介（不需要复杂的表述），简单的表述能够逻辑正确即可 【2】尽可能使递归的范围包含 二维表 的所有区间，尽量不要不包含第0列或第0行。代码中pre版本遇到相关问题，容易出错。
 ### 回溯
 - [组合](backtracking/Permutation.java):
   - https://leetcode-cn.com/problems/combinations/ .
@@ -383,9 +393,49 @@
 - [全排列](backtracking/Permutation.java):
   - https://leetcode-cn.com/problems/permutations/
   - 与 字符串的全排列基本解法相同
-
+  
+- [N皇后 - 返回成功的棋盘布局](backtracking/NQueens1.java):
+  - 返回 List<List<String>>， 返回成功的棋盘布局
+  - https://leetcode-cn.com/problems/n-queens/
+  - 回溯法经典题 暴力枚举 + 方法二： 单个数组记载已选中点 下标为row,值为 col；
+  
+- [N皇后 - 返回成功的棋盘布局数目](backtracking/NQueens2.java):
+  - https://leetcode-cn.com/problems/n-queens-ii/
+  - 暴力回溯是以每个被选中的节点为中心，看是否与其他已经选中的节点冲突；   一维数组表示方式，是以 已经选中的点为中心，来判断 待检测点 是否有效。
+  - 注意Solution2中的注解：  在 isValid函数中，对于 (row,col)节点，只遍历到 selected 数组的 **[0, row)**，因为对于每个 row 行的检查，只检查 上面的区域，因为只有上面的区域为已经选中的点，当到达 row行时，只检查上面已选中的点 是否与 当前点 冲突。所以一定要控制好遍历的范围。
 ### TopK
 - [快排方法](topK/quickSort.java):
+
+
+### 滑动窗口 （窗口内最大值最小值的更新结构） - 使用双端队列实现
+- [滑动窗口基本题](slideWindow/SlidingWindowMaxArray.java)：
+  - https://leetcode-cn.com/problems/sliding-window-maximum/
+  - 固定大小窗口，返回窗口遍历数字得到的 最大值数组
+  
+- [max - min <= target的子数组数量](slideWindow/AllLessNumSubArray.java):
+  - 【错误点】当没有元素 和 有元素时 同时处理的逻辑顺序很差， 需要反复做来加强
+
+- [加油站](slideWindow/GasStation.java):
+  - https://leetcode-cn.com/problems/gas-station/
+  - 涉及到环路问题，注意 可以 将 数组 复制成 两倍长，从而从任意一个点出发， 都可以直接遍历到 结尾处。
+  
+#### 简单队列实现滑动窗口
+- [滑动窗口的平均值]：
+  - https://leetcode-cn.com/problems/qIsx9U/
+  - 固定大小K，即为固定大小的队列长度
+  - 【错误点】使用数组模拟了队列，关于R的设置没有理清思路。 --》 环形数组 实现 队列 ， 该练习还需强化
+
+### 单调栈： 特别擅长解决 【子数组数量】 最大值，最小值 相关问题！！！ 子数组利器！！
+#### 从栈中 弹出的元素 为 要处理的元素！！！！
+#### 子数组数量，注意 左侧数目*右侧数目 = 以i元素为中心点的子数组数量！！！ （换句话说，就是包含 i 号元素的子数组数量）
+- [单调栈 - 包含重复元素和非重复元素的实现](monotonousStack/MonotonousStack.java):
+- [区间子数组的个数](monotonousStack/NumSubarrayBoundedMax.java)：**！！！ 这道题属于 单调栈类 中 【不同下标上的相同值，都需要计算， *包含* 该元素的子数组数量（左侧*右侧）】。对于相同值的处理问题， 使用 == 情况一并弹出，并计算，从而不重合且不漏。** 总结的话， 包含多个重复元素的时候（区间），这个共同区间 每次都给这一组中的最后那个元素分配，这样才不会算少或算多。（私有部分 + 分配的公共部分 == 我们的解法）
+  - https://leetcode-cn.com/problems/number-of-subarrays-with-bounded-maximum/
+  - 找出子数组中 最大元素在范围 [left, right] 内的子数组，并返回满足条件的子数组的个数。 
+  - 【错误题，需重做】 很多错误的小点
+  - 特别注意 关于以当前数字为max的区间 关于有重复值的问题 的 重合区间问题！！！ 在该问题中， 是相等时正常pop，并且计算其对应的范围。 最终可以实现，相等值的区间全覆盖并且不重合。
+  - 使用 系统提供的栈实现 + 手写数组栈实现
+
 
 
 
