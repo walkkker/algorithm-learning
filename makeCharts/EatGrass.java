@@ -1,5 +1,10 @@
 package makeCharts;
 
+/**
+ * 很神奇的递归 + 博弈思想
+ * 
+ * 值得一看
+ */
 public class EatGrass {
 
     public static String whoWins1(int N) {
@@ -11,10 +16,10 @@ public class EatGrass {
         for (int want = 1; want <= N; want *= 4) {
             if (whoWins1(N - want).equals("后手")) {
                 return "先手";
-            } else {
-                if (want > N / 4) {  // 【很重要】 防止 want * 4 出现 int溢出 （当 N 接近 2 ^ 31 次方时）
-                    break;
-                }
+            }
+            // want*4 之前的处理， 防止 int 溢出，导致for循环失灵
+            if (want > N / 4) {  // 【很重要】 防止 want * 4 出现 int溢出 （当 N 接近 2 ^ 31 次方时）
+                break;
             }
         }
         return "后手";
@@ -29,9 +34,9 @@ public class EatGrass {
         int times = 100;
 
         for (int i = 0; i < times; i++) {
-           if (whoWins1(i) != whoWins2(i)) {
-               System.out.println("opps");
-           }
+            if (whoWins1(i) != whoWins2(i)) {
+                System.out.println("opps");
+            }
         }
     }
 }
