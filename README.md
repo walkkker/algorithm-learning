@@ -435,11 +435,173 @@
   - 【错误题，需重做】 很多错误的小点
   - 特别注意 关于以当前数字为max的区间 关于有重复值的问题 的 重合区间问题！！！ 在该问题中， 是相等时正常pop，并且计算其对应的范围。 最终可以实现，相等值的区间全覆盖并且不重合。
   - 使用 系统提供的栈实现 + 手写数组栈实现
+- [子数组的最小值之和](monotonousStack/SumSubarrayMins.java):
+  - https://leetcode-cn.com/problems/sum-of-subarray-minimums/
+  - 思路本来很简单的： 【1】单调栈，最小值 【2】计算每个元素都要包含在对应子数组的情况，求子数组对应数量，左侧*右侧 类型题
+  - 【错误点，一定要重做，并且关注错误点】 数值越界问题！！！卡了一个小时。记得回去看错误的提交记录，很细节的数值越界问题，要考虑到题目给的限制条件以及数值相乘之后的大小是否越界，并且越界的话如何避免。
+  - 记录错误的题解: https://leetcode-cn.com/problems/sum-of-subarray-minimums/solution/zhong-yao-dan-diao-zhan-zi-shu-zu-min-yi-l787/
+- [子数组最小乘积的最大值](monotonousStack/MaxSumMinProduct.java):
+  - https://leetcode-cn.com/problems/maximum-subarray-min-product/
+  - 一个数组的 **最小乘积** 定义为这个数组中 【最小值】 乘以 【数组的 和】 。
+  - 解法： 单调栈 + 前缀和
+  - 单调栈问题 多多会涉及 % 10^9 + 7, 所以在设计变量类型的时候，要多多考虑使用long类型
+  - 【错误点】虽然这次注意到了 ans要使用 Long类型来存储，但是前缀和数组的类型没有注意到。 前缀和数组 使用 long类型 ==》 10^5 * 10^7 > 10^9； 所以最大和会超过 32位有符号 但是 小于64位有符号。
+- [柱状图中最大的矩形](monotonousStack/LargestRectangleArea.java):
+  - https://leetcode-cn.com/problems/largest-rectangle-in-histogram/   
+  - 子数组 最小值问题， 目标为 求 最大Area，所以是 【单调栈的比较类型题目】， *==情况下弹出正常算*，真正对的值会在最后一个相等时算出，覆盖不完全算对的值，从而最终依然可以获得正确答案。
+  
+- [二维数组的最大矩形](monotonousStack/LargestRectangle.java):
+  - https://leetcode-cn.com/problems/largest-rectangle-in-histogram/  
+  - 压缩数组 + 单调栈（最值问题）
+  - 具体而言就是 每一行的压缩数组 + 柱状图的最大矩形问题
+  
+- [二维数组中统计全1的矩阵数量](monotonousStack/NumSubmatrics.java):
+  - https://leetcode-cn.com/problems/count-submatrices-with-all-ones/
+  - 以每一行为地基 ==》 以每一行为矩阵的开始节点（也就是说 在遍历每一行的时候计算矩阵数量时，对应的矩阵必须包含该行）
+  - 几个小点：
+    - 1. 比较特殊的， == 时弹出，但是不做任何处理。 也就是说，只取相等的最右侧的下标进行 矩阵数量的运算。（**因为 本题 不需要包含当前位置i，所以与求数组数量类型问题的方法不同**）
+    - 对于每一行得到的压缩数组而言， 对于任一弹出的i节点，假设左右较小位置为l, r 矩阵数量求法： (heights[i] - Math.max(heights[l], heights[r])) * ((N + 1) * N / 2); 。 单调栈弹出过程全部做相同计算， 加和sum。
+    - ==》 最小高度差 * 【作为最小值的范围 -> 矩形】内任意同一高度下的子矩阵数量（不需要包含当前位置i）
+  - 【错误点】(1) 选取两侧较小值中的最大值时，要注意两侧无较小值的情况，要分类讨论！ （2）在取最大值时，忽略了栈中只是存的下标，拿出来比较两侧较小值中的较大值时，是要配上数组nums进行比较的，也就是说 两侧较小取得为 i,j 但是比较时，要使用 Math.max(nums[i], nums[j]);
+
+### 矩阵快速幂: 所有【严格递推式】都可以转变为【行列式】。 并且使用矩阵快速幂技巧可以将时间优化到 O（logN）；
+- [公式： 矩阵的快速幂](matrixFastPow/MatrixPow.java)： 包括两个函数：二进制幂 O(Log N) 以及 细分的 矩阵相乘函数；
+- [斐波那契数列](matrixFastPow/FibonaciiProblem.java):
+  - https://leetcode-cn.com/problems/fei-bo-na-qi-shu-lie-lcof/  
+- [青蛙跳台阶问题](matrixFastPow/NumWaysOfFrog.java):
+  - https://leetcode-cn.com/problems/qing-wa-tiao-tai-jie-wen-ti-lcof/
+
+
+### KMP算法： 字符串匹配算法
+- [KMP算法](KMP/KMP.java):
+  - 包含两部分：
+    - 主串 中 匹配 模式串
+    - next()函数
+- [旋转字符串](KMP/IsRotation.java):
+  - https://leetcode-cn.com/problems/rotate-string/
+  - String s, String goal. 创建新String newS = s + s； 则 newS 中的子串 包含了 s 所有的 旋转后的字符串 
+- [检查子树](KMP/TreeEqual.java)：
+  - https://leetcode-cn.com/problems/check-subtree-lcci/
+  - 先序后序遍历（包含null的遍历）可以确定唯一一棵二叉树。
+  - 两棵树 先序遍历结果，然后判断 子树 是否是 母树的 子串。
+  - KMP 改写： 将 char[] ==> String[]；【错误点】 注意字符串比较时，要使用 **equals**方法
+  - 【错误点，重点】KMP算法改写中， 将char[] 转换成 String[] 数组是关键。 因为String数组可以 任意的 往里面添加 数值变量。 “null” "356" "sfsf"，这些都可以！！！
+
+
+### Manacher算法
+- [最长回文子串](manacher/Manacher.java):
+  - https://leetcode-cn.com/problems/longest-palindromic-substring/
+
+- [最短回文串](manacher/ShortestPalindrome.java)：【错题】
+  - 从左边补充最少的个数组成回文字符串
+  - https://leetcode-cn.com/problems/shortest-palindrome/
+  - 可以使用 Manacher， 也可以使用KMP(使用KMP的nexts数组， 题目目的是求 最长回文前缀， 将其转化成 求最长公共前后缀的长度（ '#' + 字符串逆转）(回文串 正反相同)  ->  nexts数组)
+
+- [回文子串的数量](manacher/NumOfPalindrome.java)：
+  - https://leetcode-cn.com/problems/palindromic-substrings/
+  - 处理串中 每个位置 都对应以他为中心的回文半径, 每个中心对应的回文串范围不会覆盖，且必须全部计算。 半径-1 即为对应的回文串长度。 不管old中是偶数还是奇数，(半径 - 1)/2，即为对应该回文串中的 子回文串数量。 全部在循环中加上后，记得每个字符自己也是回文串，初始值初始化时设置即可（为 old字符串的 长度）。
+
+### 线段树
+- [线段树 - add 与 update 结合的线段树](segmentTree/SegmentTree.java)
+  - 实现 区间查询，区间更新和区间增加
+    - 区间查询：可以进行 累加和 / MAX/ MIN，等左右分支可以在O（1）的时间复杂度内完成并且不会受底层细节结果的操作（比如，众数 就不可行）。
+  - 多写几个版本： add+update, 纯 add, 纯 update
+- [掉落方块问题]
+
+### Index Tree (树状数组)
+- [Index Tree](BIT/IndexTreeCode.java):
+  - Index tree 实现的功能，线段树都能实现。 但是最大的优点就是 BIT 很容易 一维 转二维，甚至三维。
+  - 单点增加 （更新）， 区间查询
+  
+- [Index Tree 2D version](BIT/IndexTree2DVersion.java):
+  - 对于 2D而言，任何一个 点(row, col)，对应 左上角为 (1, 1), 右下角为(row, col)的 矩形内的累加和。
+  - 对于更新 和 求 累加和sum而言，每一次的row,遍历所有的col。 对应两次for循环，单个for循环的操作方式与1D Index Tree 无差别。
+
+- [逆序对问题也可以使用树状数组来解决]：
+  - 离散化   将绝对值 变成 相对值（相对值 -》 意味着 名次， 下标从1开始）
+  - 树状数组 记录 【频次】。 第一名出现了，则 help[1]++;
+
+### AC自动机： 大文章中 包含哪些关键字 （返回 list 或者 数量int）
+- [AC自动机](ACAutomation/ACAutomation.java):
+  - 1） 先建立前缀树（插入操作）；   2）再建立fail指针（BFS）  3）接着就可以输入大文章进行查询了
+
+- [这道题与AC自动机无关，但是 有点相似呢，技巧是 用到了 桶的思想 - 【匹配子序列的单词数】]
+  - https://leetcode-cn.com/problems/number-of-matching-subsequences/
+  -【错误点，重要点】桶的思想 + 针对迭代器失效的处理方法
+    
+
+### 有序表： 有序表重点在于平衡性的调整。其本质都是 BST，也就是说 在具体功能实现上，与BST没有区别。
+- 手撕 AVL树，SB树，跳表
+- [AVL树](treemap/AVL.java)
+  - 左右子树高度差 <= 1
+  - 平衡因子为 【高度】
+- [Size Balanced Tree](treemap/SizeBalancedTree.java)：
+  - 任何一个 叔叔节点的节点个数 >= 任何一个 侄子节点的节点个数
+  - 这使得 任何一个节点，左右子树的节点个数不会相差到两倍以上  =》 **这使得 BST 的高度 还是 logN 水平**
+  - 平衡因子为 【size】
+- [跳表](treemap/SkipListCode.java)
+
+### 卡特兰数： 包含延伸题型
+- https://baike.baidu.com/item/%E5%8D%A1%E7%89%B9%E5%85%B0%E6%95%B0/6125746?fr=aladdin
+```
+(1) 普遍公式： 记清楚 -> 总共 n 项， 每一个相乘的pair 加起来是 n - 1
+k(n) = k(0) * k(n - 1) + k(1) * k(n - 2) + ... + k(n - 2) * k(1) + k(n - 1) * k(0);
+
+(2) 不常用 -> 但是 编程时 使用该公式 -> 得到 结果
+k(n) = C(2n, n) / (n + 1)
+
+(3) 最常使用 -> 匹配的括号组合数量 模型
+k(n) = c(2n, n) - c(2n, n - 1)
+
+
+额外：
+求 最大公约数 -> 辗转相除法
+
+int gcd(int m, int n) {
+  return n == 0 ? m : gcd(n, m % n);
+}
+```
+- [卡特兰数](catalan/CatalanNumber.java):
+  -  纯功能函数， 记牢
+
+
+### 子数组规定累加和问题： 全部 O（N） 时间复杂度实现  双指针滑动窗口模板化 [L, R)
+- [一连问题](longestSubArrLength/PositiveArray.java)：双指针滑动窗口三部曲
+  - 非负整数
+  - 解法：双指针 -> 滑动窗口 （因为就有单调性）
+  - 【错误点，重做，自制小模版】：注意 分类讨论 R已经落在结尾节点时的情况。 ！！！ 双指针 滑动窗口模板（自己的， while版本 + for 版本）
+- [二连问题](longestSubArrLength/PositiveZeroNegative.java)：
+  - 整数范围 (可 +，0，-)
+  - 以每个位置为结尾（动态规划） -> **哈希表** 记录之前的前缀和  -> 前缀和推累加和  -> 对于位置 i 而言 前缀和为preSum， 要求累加和为K， 只需要前面存在有 前缀和为 (preSum - k)。 注意前缀和为累加和的情况，所以要 预处理时 添加 0这个前缀和。默认存在 (0, -1) 这个<preSum, index>
+- [三连问题](longestSubArrLength/LessThanK.java)：
+  - <= K 的 最长子树组长度，  同样的方法可以使用到 累加和 >= K 的最长子树组长度。 都是通的。 都是针对整数范围的。
+  - 创建 【minSum 数组】 + 对应的 【minSumEnd 数组】
+  - 根据 二连问题的解法，可以 使用 改写 有序表 实现 O（N logN） 的 解法。 此外，简便的 O(log N) 写法 是 预处理数组（形成一个非递减序列）（这个概念也较难理解，学会融会贯通） + 二分法。 具体见代码。
+  - 但是这里有 更优解法， 即实现 O（N） 的 解法 -> 有一个非常难的点，就是放弃可能性
+  - 依然是 结合动态规划 相关问题  -> **动态规划结合双指针滑动窗口**
+- [子数组平均值小于等于K的最大长度]:
+  - 三连问题 转化问题
+  - 首先预处理：  将 数组中所有值减去k ==》 转化为 求 子数组平均值<=0的最大长度  ==》 从而转化为 处理数组的 子数组累加和 <= 0 的最大长度
+  
+### 矩形旋转类型题目 - 分圈结构  （确定一个矩形 只需要 左上角一个点 和右下角 一个点）【好多小细节呀，必须要熟悉一下，逻辑缜密一点】
+- 总的思路就是， 首先将整个问题 分成多个圈（可以使用举例子的方式来模拟），然后编写 对于单圈的处理函数即可。
+ - [矩形旋转](divideCircle/RotateMatrix.java):
+  - 主函数分圈，   圈内分组
+
+- [ZigZag打印矩阵](divideCircle/ZigZagMatrix.java):
+  - 【错误点】具体见代码，使用多个变量时，注意是否会因为 提前改动一个变量，导致 另一个变量 的判断条件 失灵。
+
+- [螺旋矩阵](divideCircle/SpiralMatrix.java):
+  - https://leetcode-cn.com/problems/spiral-matrix/
+  - 【错误点】 边界错误点（左上角与右下角的 终止条件， 应该a,b,c,d全考虑） + 分类讨论不完全（单独讨论 只有 一列或一行的情况， 然后 剩余情况 交由 二维普遍情况处理）
+  - 提示： 不要怕把代码写长，先把代码写对。然后再看是否要压缩代码，来优化代码。
+
+
+### 打表法
 
 
 
-
-## [额外练习题](extraPractice)
+## [其他题型专题归纳](extraPractice)
 ### 链表部分：（链表的题通常需要注意两点：舍得用变量，千万别想着节省变量，否则容易被逻辑绕晕。 2. head 有可能需要改动时，先增加一个 假head，返回的时候直接取 假head.next，这样就不需要为修改 head 增加一大堆逻辑了。Dummy Node 哑节点）
 - [删除链表中重复的结点](extraPractice/linkedList/DeleteDuplicates.java): https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list-ii/solution/
 - [链表内指定区间反转](extraPractice/linkedList/ReverseBetween.java): 给定一个链表，给定位置 M， N， 将 [M,N]进行反转，并将头节点返回。
@@ -485,6 +647,17 @@
 - [寻找旋转数组最小值](): 还是 【分类讨论】。
   - 寻找旋转排序数组中的最小值 V1： https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array/description/
   - 旋转数组的最小数字 V2： https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array-ii/
+
+#### 最长递增子序列 
+
+
+#### 散题
+- [有序数组的唯一元素]() :
+  - 有序，只有一个元素出现一次， 其余元素全部出现两次。
+  - 要求： 时间复杂度O（logN）， 空间复杂度 O(1)
+  - https://leetcode-cn.com/problems/single-element-in-a-sorted-array/
+  - 左右奇偶数 分类讨论 + mid == mid - 1 / mid + 1 二分
+
 ### 图论
 - [01随机矩阵，求左上角到右下角最少1的路径中的1的个数，每个节点可以走向四个方向](extraPractice/maze/MinOnes.java): **【面试】**
   - 方法1： DFS + 回溯 解决题目。 完全的 暴力搜索 （目前认为无法动态规划）
@@ -503,3 +676,27 @@
   - Solution1（具体看代码注释）: 仅使用一半的数字 进行判断回文（注意奇数偶数的分情况讨论）； 需要特殊判断 10的倍数的数字（10的倍数一定不回文，但是会被判断成回文），且注意 0 的问题
   - Solution2: 次优法： 全部反转，然后比较两者是否相同。 注意条件判断是否溢出的位置
 - [字符串转换整数]():
+
+
+### 单调性 + 二分法 进阶  =》 **最长递增子序列原型**
+- [stepSum]: 
+  - 给定一个参数num, 判断这个数字是否是某一个数字的 step sum.
+  - 解法：单调性 + 二分法
+  
+- [算法原型： 最长递增子序列]
+
+- [俄罗斯套娃问题 - 本质： 最长递增子序列]
+
+### 区域和检索 - 预处理系列 （做这种初始化一次、检索多次的题目的秘诀：在初始化的时候做预处理。）
+- 当不可变时，直接预处理 对等大小的 前缀和数组 即可 ==》 O（1）求出累加和
+- [区域和检索 - 数组不可变]
+  - https://leetcode-cn.com/problems/range-sum-query-immutable/
+  - 普通的前缀和
+- [二维区域和检索 - 矩阵不可变]
+  - https://leetcode-cn.com/problems/range-sum-query-2d-immutable/
+  - 依然前缀和， 二维前缀和数组， 标记 (0,0) -> (i,j)的矩形内的累加和
+  - 小技巧，为了减少特殊情况的处理， 多增加 一行一列 在 preSum[][] 中。
+  - 【错误点】写好公式，理清 哪一块是要 进行加减的区域
+- [二维区域和检索 - 矩阵可变]：
+  - https://leetcode-cn.com/problems/range-sum-query-2d-mutable/
+  - 目前有一个解决方案，是使用 index tree
