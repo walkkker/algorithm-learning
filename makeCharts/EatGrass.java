@@ -2,7 +2,7 @@ package makeCharts;
 
 /**
  * 很神奇的递归 + 博弈思想
- * 
+ *
  * 值得一看
  */
 public class EatGrass {
