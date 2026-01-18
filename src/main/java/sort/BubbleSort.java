@@ -1,7 +1,5 @@
 package sort;
 
-import java.util.Arrays;
-
 /**
  * 冒泡排序
  */

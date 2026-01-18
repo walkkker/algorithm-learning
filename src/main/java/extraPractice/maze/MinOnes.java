@@ -1,7 +1,5 @@
 package extraPractice.maze;
 
-import practice.leetcode.Test;
-
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
